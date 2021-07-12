@@ -26,6 +26,7 @@ Even though the marketing target are people between 17 and 25, I think people of
 ## Product Spec
 
 ### 1. User Stories (Required and Optional)
+ Trello with detailed activities: https://trello.com/b/Mq5Hbz6z/safeout-android-app
 
 **Required Must-have Stories**
 
@@ -33,14 +34,14 @@ Even though the marketing target are people between 17 and 25, I think people of
 * See Other people's location 
 * Set safety status
 * Add people to your contacts list
-* Log in and crete accounts using Facebook
-* Notify contacts when safety status changes
+* Log in and create accounts using Facebook
 
 **Optional Nice-to-have Stories**
 
 * Connect with messenger for keeping in touch
 * Create contact gropus for sharing location with a certain group of people
 * Add people from QR or a different way than Facebooks friend list
+* Notify contacts when safety status changes
 
 ### 2. Screen Archetypes
 
