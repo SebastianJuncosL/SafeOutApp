@@ -81,7 +81,8 @@ Even though the marketing target are people between 17 and 25, I think people of
 <img src="https://github.com/SebastianJuncosL/SafeOutApp/blob/main/Wireframe%20image.png" width=600>
 
 ## Schema 
-[This section will be completed in Unit 9]
+<img src="https://github.com/SebastianJuncosL/SafeOutApp/blob/main/SafeOut%20DBMS%20Schema.png" width=600>
+
 ### Models
 [Add table of models]
 ### Networking
