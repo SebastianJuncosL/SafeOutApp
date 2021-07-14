@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -26,6 +27,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // hide action bar (this only contains the name of the app)
+        getSupportActionBar().hide();
+
+        // For testing because Logout button is still missing
         ParseUser.logOut();
 
         // Check if a user is logged in to skip Login activity
@@ -33,8 +37,8 @@ public class LoginActivity extends AppCompatActivity {
             goMainActivity();
         }
 
-        etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etMail);
+        etUsername = findViewById(R.id.etSUsername);
+        etPassword = findViewById(R.id.etSMail);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignup = findViewById(R.id.btnSignup);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +74,8 @@ public class LoginActivity extends AppCompatActivity {
             public void done(ParseUser user, ParseException e) {
                 if (e != null){
                     Log.e(TAG, "Issue with login", e);
+                    Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
                     return;
                 }
                 goMainActivity();

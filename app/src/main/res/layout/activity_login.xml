@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/etUsername"
+        android:id="@+id/etSUsername"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTitle"
@@ -39,10 +39,10 @@
         android:textColorHint="#6A6A6A" />
 
     <EditText
-        android:id="@+id/etMail"
+        android:id="@+id/etSMail"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etUsername"
+        android:layout_below="@+id/etSUsername"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:background="@drawable/rounded_edittext"
@@ -59,12 +59,12 @@
         android:layout_width="290dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/tvNoacc"
-        android:layout_below="@+id/etMail"
+        android:layout_below="@+id/etSMail"
         android:layout_alignParentEnd="false"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="53dp"
-        android:layout_marginBottom="105dp"
+        android:layout_marginBottom="165dp"
         android:fontFamily="@font/lato"
         android:text="Login"
         app:backgroundTint="#8FDB39" />

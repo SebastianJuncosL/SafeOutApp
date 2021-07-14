@@ -7,14 +7,14 @@
     tools:context=".SignUpActivity">
 
     <Button
-        android:id="@+id/btnSignup2"
+        android:id="@+id/btnSSignup"
         android:layout_width="290dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etPassword"
+        android:layout_below="@+id/etSPassword"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:layout_marginBottom="170dp"
+        android:layout_marginBottom="230dp"
         android:fontFamily="@font/lato"
         android:text="Sign Up!"
         app:backgroundTint="#FF9C66" />
@@ -36,7 +36,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/etUsername"
+        android:id="@+id/etSUsername"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTitle"
@@ -52,26 +52,26 @@
         android:textColorHint="#6A6A6A" />
 
     <EditText
-        android:id="@+id/etMail"
+        android:id="@+id/etSMail"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etUsername"
+        android:layout_below="@+id/etSUsername"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:background="@drawable/rounded_edittext"
         android:ems="10"
         android:fontFamily="@font/lato"
         android:hint="Mail"
-        android:inputType="textPassword"
+        android:inputType="textEmailAddress"
         android:padding="15dp"
         android:textColor="@color/black"
         android:textColorHint="#6A6A6A" />
 
     <EditText
-        android:id="@+id/etPassword"
+        android:id="@+id/etSPassword"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etMail"
+        android:layout_below="@+id/etSMail"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:background="@drawable/rounded_edittext"
