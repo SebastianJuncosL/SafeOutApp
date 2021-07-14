@@ -1,4 +1,4 @@
-package com.example.safeout;
+package com.example.safeout.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.safeout.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         // hide action bar (this only contains the name of the app)
         getSupportActionBar().hide();
 
+        // TODO: Add logout button
         // For testing because Logout button is still missing
         ParseUser.logOut();
 

@@ -1,8 +1,10 @@
-package com.example.safeout;
+package com.example.safeout.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.safeout.R;
 
 public class MainActivity extends AppCompatActivity {
 
