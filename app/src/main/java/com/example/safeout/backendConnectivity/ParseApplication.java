@@ -1,4 +1,4 @@
-package com.example.safeout;
+package com.example.safeout.backendConnectivity;
 
 import android.app.Application;
 

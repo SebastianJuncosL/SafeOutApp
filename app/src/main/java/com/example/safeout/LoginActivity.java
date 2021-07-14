@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // hide action bar (this only contains the name of the app)
-        getSupportActionBar().hide();
+        ParseUser.logOut();
 
         // Check if a user is logged in to skip Login activity
         if(ParseUser.getCurrentUser() != null){
@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etPassword);
+        etPassword = findViewById(R.id.etMail);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignup = findViewById(R.id.btnSignup);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -45,6 +45,23 @@ public class LoginActivity extends AppCompatActivity {
                 loginUser(user, password);
             }
         });
+        btnSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goSignUpActivity();
+            }
+        });
+    }
+
+    private void goMainActivity() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+        finish();
+    }
+
+    private void goSignUpActivity() {
+        Intent i = new Intent(this, SignUpActivity.class);
+        startActivity(i);
     }
 
     private void loginUser(String user, String password) {
@@ -58,11 +75,5 @@ public class LoginActivity extends AppCompatActivity {
                 goMainActivity();
             }
         });
-    }
-
-    private void goMainActivity() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
-        finish();
     }
 }
