@@ -15,8 +15,10 @@ buildscript {
 allprojects {
     repositories {
         google()
-        mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
+        // maven is required for the app so that it works with Back4App backend
+        maven { url "https://jitpack.io" }
+
     }
 }
 
