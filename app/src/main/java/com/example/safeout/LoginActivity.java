@@ -10,5 +10,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        // hide action bar (this only contains the name of the app)
+        getSupportActionBar().hide();
     }
 }
