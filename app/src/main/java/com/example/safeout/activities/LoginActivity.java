@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // TODO: Add logout button
         // For testing because Logout button is still missing
-        ParseUser.logOut();
+        // ParseUser.logOut();
 
         // Check if a user is logged in to skip Login activity
         if(ParseUser.getCurrentUser() != null){

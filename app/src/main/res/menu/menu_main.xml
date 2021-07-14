@@ -4,14 +4,17 @@
     <!-- TODO: add/create icons for navbar -->
     <item
         android:id="@+id/status"
-        android:title="Status"/>
+        android:icon="@drawable/ic_action_name"
+        android:title="Status" />
 
     <item
         android:id="@+id/map"
-        android:title="Map"/>
+        android:icon="@drawable/ic_action_map"
+        android:title="Map" />
 
     <item
         android:id="@+id/user"
-        android:title="User"/>
+        android:icon="@drawable/ic_action_profile"
+        android:title="User" />
 
 </menu>
