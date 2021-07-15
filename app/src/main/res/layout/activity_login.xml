@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.LoginActivity">
+    tools:context=".activities.LoginActivity"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/tvTitle"
@@ -67,7 +68,8 @@
         android:layout_marginBottom="165dp"
         android:fontFamily="@font/lato"
         android:text="Login"
-        app:backgroundTint="#8FDB39" />
+        app:backgroundTint="#8FDB39"
+        android:textColor="@color/white"/>
 
     <Button
         android:id="@+id/btnSignup"
@@ -78,7 +80,8 @@
         android:layout_marginBottom="82dp"
         android:fontFamily="@font/lato"
         android:text="Sign Up!"
-        app:backgroundTint="#FF9C66" />
+        app:backgroundTint="#FF9C66"
+        android:textColor="@color/white"/>
 
     <TextView
         android:id="@+id/tvNoacc"
