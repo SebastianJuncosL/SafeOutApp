@@ -22,6 +22,7 @@ public class StatusFragment extends Fragment {
 
     private Button btnSafe;
     private Button btnAlert;
+    private Button btnDanger;
 
     @Nullable
     @Override
@@ -34,25 +35,32 @@ public class StatusFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         btnSafe = view.findViewById(R.id.btnSafe);
         btnAlert = view.findViewById(R.id.btnAlert);
+        btnDanger = view.findViewById(R.id.btnDanger);
+
         btnSafe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                readObject();
+                setSafe();
             }
         });
-
         btnAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateObject();
+                setAlert();
             }
         });
+        btnDanger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setDanger();
+            }
+        });
+
     }
 
-    public void readObject() {
+    public void setSafe() {
         // Database Class goes in getQuery
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-
         // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
         query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
             if (e == null) {
@@ -61,28 +69,47 @@ public class StatusFragment extends Fragment {
                 //All other fields will remain the same
                 object.saveInBackground();
                 Log.d("StatusFragment", object.get("currentStatus").toString());
-
             } else {
                 // something went wrong
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("StatusFragment", object.getObjectId());
             }
         });
     }
 
-    public void updateObject() {
+    public void setAlert() {
+        // Database Class goes in getQuery
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
         query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
             if (e == null) {
-                object.put("currentStatus", "(undefined)");
+                object.put("currentStatus", "Alert");
                 //All other fields will remain the same
                 object.saveInBackground();
                 Log.d("StatusFragment", object.get("currentStatus").toString());
-
             } else {
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-
             }
         });
     }
+
+    private void setDanger() {
+        // Database Class goes in getQuery
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
+        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
+            if (e == null) {
+                //Object was successfully retrieved
+                object.put("currentStatus", "Danger");
+                //All other fields will remain the same
+                object.saveInBackground();
+                Log.d("StatusFragment", object.get("currentStatus").toString());
+            } else {
+                // something went wrong
+                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // TODO: check if there's an active location before letting the user change it's status
+    // TODO: make sure status returns to (undefined) or at least Safe when user logs out or stops sharing location
 }
