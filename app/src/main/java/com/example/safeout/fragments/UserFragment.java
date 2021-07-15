@@ -44,7 +44,6 @@ public class UserFragment extends Fragment {
     }
 
     private void logOut() {
-
         ParseUser.logOut();
         Intent i = new Intent(getContext(), LoginActivity.class);
         startActivity(i);
@@ -70,7 +69,6 @@ public class UserFragment extends Fragment {
                 // something went wrong
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
             if (object.get("currentStatus") == "(undefined)") {
                 logOut();
             }
