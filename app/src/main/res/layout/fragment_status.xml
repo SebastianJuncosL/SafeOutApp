@@ -1,6 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/btnDanger"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:fontFamily="@font/lato"
+        android:text="In Danger"
+        android:textColor="@color/white"
+        app:backgroundTint="#FF383B" />
+
+    <Button
+        android:id="@+id/btnAlert"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_above="@+id/btnDanger"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:fontFamily="@font/lato"
+        android:text="Alert"
+        android:textColor="@color/white"
+        app:backgroundTint="#FF9C66" />
+
+    <Button
+        android:id="@+id/btnSafe"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_above="@+id/btnAlert"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:fontFamily="@font/lato"
+        android:text="Safe"
+        android:textColor="@color/white"
+        app:backgroundTint="#8FDB39" />
+
+    <TextView
+        android:id="@+id/tvStatusTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="20dp"
+        android:fontFamily="@font/lato_light"
+        android:text="How are you feeling?"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</RelativeLayout>
