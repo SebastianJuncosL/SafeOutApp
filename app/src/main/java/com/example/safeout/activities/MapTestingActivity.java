@@ -31,7 +31,7 @@ public class MapTestingActivity extends AppCompatActivity implements GoogleMap.O
 
         checkForegroundPermission();
         checkBackgroundPermission();
-        
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
