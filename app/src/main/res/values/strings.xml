@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SafeOut</string>
+    <string name="google_map_api_key">AIzaSyAuWoOnnvcQOwxg4DruA2RMV4lFPtmOglg</string>
 </resources>
