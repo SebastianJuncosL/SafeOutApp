@@ -8,7 +8,7 @@
         android:title="Status" />
 
     <item
-        android:id="@+id/mapFragment"
+        android:id="@+id/mapActivity"
         android:icon="@drawable/ic_action_map"
         android:title="Map" />
 

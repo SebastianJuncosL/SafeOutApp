@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.status:
                         selectedFragment = new StatusFragment();
                         break;
-                    case R.id.mapFragment:
+                    case R.id.mapActivity:
                         selectedFragment = new MapFragment();
                         break;
                     case R.id.user:

@@ -6,7 +6,7 @@
     android:background="@color/white">
 
     <fragment
-        android:id="@+id/mapFragment"
+        android:id="@+id/mapActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="400dp"
         android:layout_height="450dp"
@@ -19,7 +19,7 @@
         android:id="@+id/btnGoToMap"
         android:layout_width="157dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mapFragment"
+        android:layout_below="@+id/mapActivity"
         android:layout_alignParentStart="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="127dp"

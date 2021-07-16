@@ -25,6 +25,8 @@ import com.example.safeout.activities.MapTestingActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
 
@@ -32,7 +34,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButto
     private Button btnGoToMap;
     private SupportMapFragment mapFragment;
     private FragmentActivity myContext;
-    private GoogleMap map;
 
     @Nullable
     @Override
@@ -43,8 +44,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButto
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        checkForegroundPermission();
-        checkBackgroundPermission();
         btnGoToMap = view.findViewById(R.id.btnGoToMap);
         btnGoToMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,8 +51,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButto
                 goToMap();
             }
         });
-        myContext = (FragmentActivity) getContext();
-        mapFragment = (SupportMapFragment) myContext.getSupportFragmentManager().findFragmentById(R.id.mapFragment);
     }
 
 
@@ -77,8 +74,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButto
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         map.setMyLocationEnabled(true);
-        map.setOnMyLocationButtonClickListener(this);
-        map.setOnMyLocationClickListener(this);
     }
 
     private void checkBackgroundPermission() {
