@@ -23,21 +23,24 @@ import com.example.safeout.R;
 import com.example.safeout.activities.MainActivity;
 import com.example.safeout.activities.MapTestingActivity;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String TAG = "MapFragment";
     private Button btnGoToMap;
-    private SupportMapFragment mapFragment;
-    private FragmentActivity myContext;
+    private MapView mapView;
+    public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
@@ -51,6 +54,14 @@ public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButto
                 goToMap();
             }
         });
+        mapView = view.findViewById(R.id.mapView);
+
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
     }
 
 
@@ -60,41 +71,54 @@ public class MapFragment extends Fragment implements GoogleMap.OnMyLocationButto
     }
 
     @Override
-    public boolean onMyLocationButtonClick() {
-        return false;
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+        }
+
+        mapView.onSaveInstanceState(mapViewBundle);
     }
 
     @Override
-    public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(getContext(), "Current location:\n" + location, Toast.LENGTH_LONG)
-                .show();
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
     }
 
-    @SuppressLint("MissingPermission")
     @Override
-    public void onMapReady(@NonNull GoogleMap map) {
-        map.setMyLocationEnabled(true);
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
     }
 
-    private void checkBackgroundPermission() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((MainActivity) getActivity(), new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 1);
-        }else{
-            Log.d(TAG, "Location permission is already active");
-        }
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 
-    private void checkForegroundPermission() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((MainActivity) getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }else{
-            Log.d(TAG, "Location permission is already active");
-        }
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 }
