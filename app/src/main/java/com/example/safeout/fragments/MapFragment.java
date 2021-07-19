@@ -22,12 +22,17 @@ import androidx.fragment.app.FragmentActivity;
 import com.example.safeout.R;
 import com.example.safeout.activities.MainActivity;
 import com.example.safeout.activities.MapTestingActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.parse.ParseGeoPoint;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -35,6 +40,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Button btnGoToMap;
     private MapView mapView;
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private FusedLocationProviderClient fLocationClient;
 
     @Nullable
     @Override
@@ -48,13 +54,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         btnGoToMap = view.findViewById(R.id.btnGoToMap);
+        mapView = view.findViewById(R.id.mapView);
+        fLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+
         btnGoToMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 goToMap();
             }
         });
-        mapView = view.findViewById(R.id.mapView);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -64,6 +72,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.getMapAsync(this);
     }
 
+    private void getLastLocation() {
+        Log.d(TAG, "Function called");
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(Task<Location> task) {
+                Location location = task.getResult();
+                ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                Log.d(TAG, "Latitude: "+ geoPoint.getLatitude() + " Longitude: " + geoPoint.getLongitude());
+            }
+        });
+    }
 
     private void goToMap() {
         Intent i = new Intent(getContext(), MapTestingActivity.class);
@@ -86,10 +112,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         googleMap.setMyLocationEnabled(true);
+        getLastLocation();
     }
 
     @Override
