@@ -11,15 +11,14 @@
         android:id="@+id/btnSSignup"
         android:layout_width="290dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etSPassword"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="230dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="130dp"
         android:fontFamily="@font/lato"
         android:text="Sign Up!"
-        app:backgroundTint="#FF9C66"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white"
+        app:backgroundTint="#FF9C66" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -43,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTitle"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/rounded_edittext"
         android:ems="10"
         android:fontFamily="@font/lato"
@@ -84,6 +83,34 @@
         android:padding="15dp"
         android:textColor="@color/black"
         android:textColorHint="#6A6A6A" />
+
+    <EditText
+        android:id="@+id/etPhone"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etSPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/rounded_edittext"
+        android:ems="10"
+        android:fontFamily="@font/lato"
+        android:hint="Phone Number"
+        android:inputType="phone"
+        android:padding="15dp"
+        android:textColor="@color/black"
+        android:textColorHint="#6A6A6A" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etPhone"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Your phone number will only be seen by your contacts in case they need to call you"
+        android:textAlignment="center"
+        android:textColor="#222222"
+        android:textSize="10sp" />
 
 
 </RelativeLayout>

@@ -42,11 +42,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private FusedLocationProviderClient fLocationClient;
 
-    @Nullable
+    // Doing anything inside this function is useless,
+    // since there is nothing loaded in the app yet.
+    // Do everything in onViewCreated
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
@@ -70,6 +70,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
+        getLastLocation();
     }
 
     private void getLastLocation() {
@@ -119,7 +120,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         googleMap.setMyLocationEnabled(true);
-        getLastLocation();
     }
 
     @Override

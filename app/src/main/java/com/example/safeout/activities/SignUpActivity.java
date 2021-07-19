@@ -18,8 +18,10 @@ public class SignUpActivity extends AppCompatActivity {
     public static final String TAG = "SignUpActivity";
     private EditText etSUsername;
     private EditText etSPassword;
+    private EditText etPhone;
     private EditText etSMail;
     private Button btnSSignup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +31,7 @@ public class SignUpActivity extends AppCompatActivity {
         etSUsername = findViewById(R.id.etSUsername);
         etSPassword = findViewById(R.id.etSPassword);
         etSMail = findViewById(R.id.etSMail);
+        etPhone = findViewById(R.id.etPhone);
         btnSSignup = findViewById(R.id.btnSSignup);
         btnSSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,8 +39,9 @@ public class SignUpActivity extends AppCompatActivity {
                 String user = etSUsername.getText().toString();
                 String password = etSPassword.getText().toString();
                 String mail = etSMail.getText().toString();
+                String phone = etPhone.getText().toString();
                 if (checkPassword(password) == true){
-                    registerUser(user, password, mail);
+                    registerUser(user, password, mail, phone);
                 } else {
                     Toast.makeText(SignUpActivity.this, "Password length must be 8 characters long", Toast.LENGTH_SHORT).show();
                 }
@@ -52,11 +56,12 @@ public class SignUpActivity extends AppCompatActivity {
         return false;
     }
 
-    private void registerUser(String user, String password, String mail) {
+    private void registerUser(String user, String password, String mail, String phone) {
         ParseUser newUser = new ParseUser();
         newUser.setEmail(mail);
         newUser.setPassword(password);
         newUser.setUsername(user);
+        newUser.put("phoneNumber", phone);
         newUser.signUpInBackground(new SignUpCallback() {
             @Override
             public void done(ParseException e) {
