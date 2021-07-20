@@ -24,10 +24,11 @@ import com.example.safeout.activities.MainActivity;
 import com.example.safeout.activities.MapTestingActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -76,6 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         getLastLocation();
     }
 
+    // getting location also uploads it to DB
     private void getLastLocation() {
         Log.d(TAG, "Function called");
 
@@ -90,6 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onComplete(Task<Location> task) {
                 Location location = task.getResult();
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                // Upload location to DB
                 sendLocationToDB(geoPoint);
                 Log.d(TAG, "Latitude: "+ geoPoint.getLatitude() + " Longitude: " + geoPoint.getLongitude());
 
@@ -127,6 +130,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.setMyLocationEnabled(true);
     }
 
+    private void sendLocationToDB(ParseGeoPoint location) {
+        // Database Class goes in getQuery
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
+        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
+            if (e == null) {
+                //Object was successfully retrieved
+                object.put("currentLocation", location);
+                //All other fields will remain the same
+                object.saveInBackground();
+                Log.d(TAG, object.get("currentLocation").toString());
+            } else {
+                // something went wrong
+                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -155,23 +178,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-
-    private void sendLocationToDB(ParseGeoPoint location) {
-        // Database Class goes in getQuery
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
-        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
-            if (e == null) {
-                //Object was successfully retrieved
-                object.put("currentLocation", location);
-                //All other fields will remain the same
-                object.saveInBackground();
-                Log.d(TAG, object.get("currentLocation").toString());
-            } else {
-                // something went wrong
-                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 }
