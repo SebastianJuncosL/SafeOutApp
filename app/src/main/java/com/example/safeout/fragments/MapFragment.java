@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -85,7 +86,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
         getLastLocation();
-        getFriendsLocations();
+
+        try {
+            getFriends();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     // getting location also uploads it to DB
@@ -152,7 +158,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 object.put("currentLocation", location);
                 //All other fields will remain the same
                 object.saveInBackground();
-                Log.d(TAG, object.get("currentLocation").toString());
+                // Log.d(TAG, object.get("currentLocation").toString());
             } else {
                 // something went wrong
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -160,28 +166,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private void getFriendsLocations() {
+    private void getFriends() throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
-            if (e == null) {
-                //Object was successfully retrieved
-                // Put all friends in local contacts list
-                userNames = (ArrayList<String>)object.get("friendsList");
-
-                if (userNames != null) {
-                    Log.d(TAG, object.get("friendsList").toString());
-                    Log.d(TAG, userNames.get(0));
-                } else {
-                    Log.d(TAG, "Friends list is empty");
-                }
-
-            } else {
-                // something went wrong
-                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList") == null)
+        {
+            Log.d(TAG, "User has no contacts");
+            return;
+        }
+        userNames = (ArrayList<String>) query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList");
+        getFriendsLocations();
     }
 
+    private void getFriendsLocations(){
+        for (int i = 0; i < userNames.size(); i++) {
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+            query.getInBackground(userNames.get(i), (object, e) -> {
+                if (e == null) {
+                    ParseGeoPoint point = (ParseGeoPoint) object.get("currentLocation");
+                    Log.d(TAG, "Location of user is lon " + point.getLongitude() + " lat " + point.getLatitude());
+                } else {
+                    // something went wrong
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 
     @Override
     public void onStart() {
