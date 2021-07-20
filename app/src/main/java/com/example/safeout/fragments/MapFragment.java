@@ -180,6 +180,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         userNames = (ArrayList<String>) query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList");
         getFriendsLocations();
+
+    }
+
+    private void getFriendsLocations() throws ParseException {
+        for (int i = 0; i < userNames.size(); i++) {
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+            coordinates.add((ParseGeoPoint) query.get(userNames.get(i)).get("currentLocation"));
+
+        }
         if (coordinates == null) {
             Log.d(TAG, "There are no friends, or they aren't sharing location");
         } else {
@@ -187,15 +196,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Log.d(TAG, userNames.get(i) + " location is " + coordinates.get(i).toString());
             }
         }
-    }
-
-    private void getFriendsLocations() throws ParseException {
-        for (int i = 0; i < userNames.size(); i++) {
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-            coordinates.add((ParseGeoPoint) query.get(userNames.get(i)).get("currentLocation"));
-            
-        }
-
     }
 
     @Override
