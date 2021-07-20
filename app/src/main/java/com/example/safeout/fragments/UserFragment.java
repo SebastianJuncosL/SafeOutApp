@@ -63,7 +63,8 @@ public class UserFragment extends Fragment {
                 emptyLocation.setLatitude(0.0);
                 emptyLocation.setLongitude(0.0);
                 object.put("currentStatus", "(undefined)");
-                object.put("currentLocation", emptyLocation);
+                // TODO: Uncomment location reset when logging out
+                // object.put("currentLocation", emptyLocation);
                 //All other fields will remain the same
                 try {
                     object.save();

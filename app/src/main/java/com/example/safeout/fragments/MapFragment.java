@@ -167,9 +167,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Object was successfully retrieved
                 // Put all friends in local contacts list
                 userNames = (ArrayList<String>)object.get("friendsList");
-                
-                Log.d(TAG, object.get("friendsList").toString());
-                Log.d(TAG, userNames.get(0));
+
+                if (userNames != null) {
+                    Log.d(TAG, object.get("friendsList").toString());
+                    Log.d(TAG, userNames.get(0));
+                } else {
+                    Log.d(TAG, "Friends list is empty");
+                }
 
             } else {
                 // something went wrong
