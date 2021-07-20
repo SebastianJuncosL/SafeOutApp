@@ -187,7 +187,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for (int i = 0; i < userNames.size(); i++) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
             coordinates.add((ParseGeoPoint) query.get(userNames.get(i)).get("currentLocation"));
-
         }
         if (coordinates == null) {
             Log.d(TAG, "There are no friends, or they aren't sharing location");
