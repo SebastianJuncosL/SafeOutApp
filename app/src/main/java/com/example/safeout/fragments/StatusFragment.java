@@ -111,5 +111,4 @@ public class StatusFragment extends Fragment {
     }
 
     // TODO: check if there's an active location before letting the user change it's status
-    // TODO: make sure status returns to (undefined) or at least Safe when user logs out or stops sharing location
 }

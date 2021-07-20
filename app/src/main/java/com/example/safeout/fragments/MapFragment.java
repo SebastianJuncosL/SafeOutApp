@@ -33,6 +33,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -87,7 +90,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onComplete(Task<Location> task) {
                 Location location = task.getResult();
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                sendLocationToDB(geoPoint);
                 Log.d(TAG, "Latitude: "+ geoPoint.getLatitude() + " Longitude: " + geoPoint.getLongitude());
+
             }
         });
     }
@@ -150,5 +155,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    private void sendLocationToDB(ParseGeoPoint location) {
+        // Database Class goes in getQuery
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
+        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
+            if (e == null) {
+                //Object was successfully retrieved
+                object.put("currentLocation", location);
+                //All other fields will remain the same
+                object.saveInBackground();
+                Log.d(TAG, object.get("currentLocation").toString());
+            } else {
+                // something went wrong
+                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
