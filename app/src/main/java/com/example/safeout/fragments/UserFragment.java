@@ -16,7 +16,9 @@ import androidx.fragment.app.Fragment;
 import com.example.safeout.R;
 import com.example.safeout.activities.LoginActivity;
 import com.example.safeout.activities.MainActivity;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -57,7 +59,11 @@ public class UserFragment extends Fragment {
         query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
             if (e == null) {
                 //Object was successfully retrieved
+                ParseGeoPoint emptyLocation = new ParseGeoPoint();
+                emptyLocation.setLatitude(0.0);
+                emptyLocation.setLongitude(0.0);
                 object.put("currentStatus", "(undefined)");
+                object.put("currentLocation", emptyLocation);
                 //All other fields will remain the same
                 try {
                     object.save();
