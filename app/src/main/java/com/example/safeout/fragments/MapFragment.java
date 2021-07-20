@@ -1,8 +1,6 @@
 package com.example.safeout.fragments;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,25 +8,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.example.safeout.R;
-import com.example.safeout.activities.MainActivity;
-import com.example.safeout.activities.MapTestingActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -40,15 +32,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String TAG = "MapFragment";
-    private Button btnGoToMap;
     private MapView mapView;
     private GoogleMap map;
     private LatLngBounds mapBoundary;
@@ -59,6 +47,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Friends/Contacts locations
     private ArrayList<ParseGeoPoint> coordinates = new ArrayList<>();
 
+    // Creating Fragments Functions ------------------------------------------------------------------------------------------------------------
     // Doing anything inside this function is useless,
     // since there is nothing loaded in the app yet.
     // Do everything in onViewCreated
@@ -70,16 +59,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnGoToMap = view.findViewById(R.id.btnGoToMap);
         mapView = view.findViewById(R.id.mapView);
         fLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-
-        btnGoToMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToMap();
-            }
-        });
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -96,6 +77,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             e.printStackTrace();
         }
     }
+
+    // Backend and Location Functions --------------------------------------------------------------------------------------------------
 
     // getting location also uploads it to DB
     private void getLastLocation() {
@@ -120,37 +103,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void setUserPosition() {
         ParseGeoPoint user;
-    }
-
-    private void goToMap() {
-        Intent i = new Intent(getContext(), MapTestingActivity.class);
-        startActivity(i);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
-        if (mapViewBundle == null) {
-            mapViewBundle = new Bundle();
-            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
-        }
-
-        mapView.onSaveInstanceState(mapViewBundle);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        googleMap.setMyLocationEnabled(true);
-        map = googleMap;
     }
 
     private void sendLocationToDB(ParseGeoPoint location) {
@@ -197,6 +149,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    // Map Only Functions ------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+        }
+
+        mapView.onSaveInstanceState(mapViewBundle);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+        map = googleMap;
+    }
+
+    // Life Cycle Functions ----------------------------------------------------------------------------------------------------------
     @Override
     public void onStart() {
         super.onStart();
