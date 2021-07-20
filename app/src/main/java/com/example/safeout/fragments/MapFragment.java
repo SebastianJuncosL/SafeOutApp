@@ -38,13 +38,23 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
+
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String TAG = "MapFragment";
     private Button btnGoToMap;
     private MapView mapView;
+    private GoogleMap map;
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private FusedLocationProviderClient fLocationClient;
+    // Friends/Contacts List
+    private ArrayList<String> userNames = new ArrayList<>();
+    // Friends/Contacts locations
+    private ArrayList<ParseGeoPoint> coordinates = new ArrayList<>();
 
     // Doing anything inside this function is useless,
     // since there is nothing loaded in the app yet.
@@ -75,6 +85,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
         getLastLocation();
+        getFriendsLocations();
     }
 
     // getting location also uploads it to DB
@@ -120,6 +131,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
         googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -148,12 +160,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
+    private void getFriendsLocations() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
+            if (e == null) {
+                //Object was successfully retrieved
+                // Put all friends in local contacts list
+                userNames = (ArrayList<String>)object.get("friendsList");
+                
+                Log.d(TAG, object.get("friendsList").toString());
+                Log.d(TAG, userNames.get(0));
+
+            } else {
+                // something went wrong
+                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 
     @Override
     public void onStart() {
         super.onStart();
         mapView.onStart();
+
     }
 
     @Override
@@ -166,6 +196,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
     }
 
     @Override
