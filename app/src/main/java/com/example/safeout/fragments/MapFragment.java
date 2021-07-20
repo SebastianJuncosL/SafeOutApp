@@ -30,6 +30,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,6 +51,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Button btnGoToMap;
     private MapView mapView;
     private GoogleMap map;
+    private LatLngBounds mapBoundary;
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private FusedLocationProviderClient fLocationClient;
     // Friends/Contacts List
@@ -86,6 +88,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
         getLastLocation();
+        // Fetch location and reposition camera
 
         try {
             getFriends();
@@ -111,10 +114,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
                 // Upload location to DB
                 sendLocationToDB(geoPoint);
-                Log.d(TAG, "Latitude: "+ geoPoint.getLatitude() + " Longitude: " + geoPoint.getLongitude());
-
             }
         });
+    }
+
+    private void setUserPosition() {
+        ParseGeoPoint user;
     }
 
     private void goToMap() {
@@ -137,7 +142,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
         googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -146,6 +150,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         googleMap.setMyLocationEnabled(true);
+        map = googleMap;
     }
 
     private void sendLocationToDB(ParseGeoPoint location) {
@@ -175,21 +180,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         userNames = (ArrayList<String>) query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList");
         getFriendsLocations();
+        if (coordinates == null) {
+            Log.d(TAG, "There are no friends, or they aren't sharing location");
+        } else {
+            for (int i = 0; i < coordinates.size(); i++) {
+                Log.d(TAG, userNames.get(i) + " location is " + coordinates.get(i).toString());
+            }
+        }
     }
 
-    private void getFriendsLocations(){
+    private void getFriendsLocations() throws ParseException {
         for (int i = 0; i < userNames.size(); i++) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-            query.getInBackground(userNames.get(i), (object, e) -> {
-                if (e == null) {
-                    ParseGeoPoint point = (ParseGeoPoint) object.get("currentLocation");
-                    Log.d(TAG, "Location of user is lon " + point.getLongitude() + " lat " + point.getLatitude());
-                } else {
-                    // something went wrong
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            coordinates.add((ParseGeoPoint) query.get(userNames.get(i)).get("currentLocation"));
+            
         }
+
     }
 
     @Override
