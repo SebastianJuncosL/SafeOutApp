@@ -49,9 +49,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private FusedLocationProviderClient fLocationClient;
     // Friends/Contacts List
+    private ArrayList<String> userIds = new ArrayList<>();
     private ArrayList<String> userNames = new ArrayList<>();
     // Friends/Contacts locations
     private ArrayList<ParseGeoPoint> coordinates = new ArrayList<>();
+    // Friends Phone numbers
+    private ArrayList<String> phoneNumbers = new ArrayList<>();
 
     // Creating Fragments Functions ------------------------------------------------------------------------------------------------------------
     // Doing anything inside this function is useless,
@@ -67,6 +70,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState);
         mapView = view.findViewById(R.id.mapView);
         fLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+
+        getLastLocation();
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
@@ -76,12 +81,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        getLastLocation();
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
-
-
-
     }
 
     // Backend and Location Functions --------------------------------------------------------------------------------------------------
@@ -98,18 +99,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onComplete(Task<Location> task) {
                 Location location = task.getResult();
-                ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-                // Upload location to DB
-                sendLocationToDB(geoPoint);
+                if (location != null) {
+                    Log.d(TAG, String.valueOf(location.getLatitude()));
+                    ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                    // Upload location to DB
+                    userLocation = geoPoint;
+                    sendLocationToDB(geoPoint);
+                }
+
             }
         });
     }
 
     private void sendLocationToDB(ParseGeoPoint location) {
         // Database Class goes in getQuery
+        userLocation = location;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
         // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
-
         query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
             if (e == null) {
                 //Object was successfully retrieved
@@ -117,7 +123,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //All other fields will remain the same
                 try {
                     object.save();
-                    setUserPosition();
                 } catch (ParseException parseException) {
                     parseException.printStackTrace();
                 }
@@ -137,15 +142,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.d(TAG, "User has no contacts");
             return;
         }
-        userNames = (ArrayList<String>) query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList");
-        getFriendsLocations();
+        userIds = (ArrayList<String>) query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList");
+        getFriendsInformation();
 
     }
 
-    private void getFriendsLocations() throws ParseException {
-        for (int i = 0; i < userNames.size(); i++) {
+    private void getFriendsInformation() throws ParseException {
+        for (int i = 0; i < userIds.size(); i++) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-            coordinates.add((ParseGeoPoint) query.get(userNames.get(i)).get("currentLocation"));
+            coordinates.add((ParseGeoPoint) query.get(userIds.get(i)).get("currentLocation"));
+            userNames.add((String) query.get(userIds.get(i)).get("username"));
+            phoneNumbers.add((String) query.get(userIds.get(i)).get("phoneNumber"));
         }
         if (coordinates == null) {
             Log.d(TAG, "There are no friends, or they aren't sharing location");
@@ -181,12 +188,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         googleMap.setMyLocationEnabled(true);
         map = googleMap;
+
+        if (coordinates != null) {
+            for (int i = 0; i < userNames.size(); i++) {
+                LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
+                map.addMarker(
+                        new MarkerOptions()
+                                .position(location)
+                                .title(userNames.get(i))
+                                .snippet(phoneNumbers.get(i))
+                );
+            }
+        }
+
+
+        try {
+            addMapMarkers();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
                 try {
                     setCameraView();
-                    addMapMarkers();
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -214,7 +240,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 for (int  i = 0; i >coordinates.size(); i++) {
                     ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
                     LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
-                    Marker contact = map.addMarker(
+                    map.addMarker(
                             new MarkerOptions()
                                     .position(location)
                                     .title((String) query.get(userNames.get(i)).get("username"))
@@ -226,6 +252,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
+
     // Life Cycle Functions ----------------------------------------------------------------------------------------------------------
     @Override
     public void onStart() {
