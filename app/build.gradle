@@ -43,4 +43,6 @@ dependencies {
     // Google Maps dependency
     implementation 'com.google.android.gms:play-services-maps:17.0.1'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    // Cluster dependency -> used for making user markers
+    implementation "com.google.maps.android:android-maps-utils:2.2.3"
 }

@@ -26,6 +26,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -70,31 +71,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
-        mapView.onCreate(mapViewBundle);
-        mapView.getMapAsync(this);
-        getLastLocation();
-
-        try {
-            setUserPosition();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        // TODO: Fetch location and reposition camera
-
         try {
             getFriends();
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
+        getLastLocation();
+
+
     }
 
     // Backend and Location Functions --------------------------------------------------------------------------------------------------
-
-    private void setUserPosition() throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        userLocation = (ParseGeoPoint) query.get(ParseUser.getCurrentUser().getObjectId()).get("currentLocation");
-    }
 
     // getting location also uploads it to DB
     private void getLastLocation() {
@@ -119,18 +108,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Database Class goes in getQuery
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
         // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
+
         query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
             if (e == null) {
                 //Object was successfully retrieved
                 object.put("currentLocation", location);
                 //All other fields will remain the same
-                object.saveInBackground();
+                try {
+                    object.save();
+                    setUserPosition();
+                } catch (ParseException parseException) {
+                    parseException.printStackTrace();
+                }
                 // Log.d(TAG, object.get("currentLocation").toString());
             } else {
                 // something went wrong
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     // Retrieving contacts also gets their location
@@ -183,31 +179,52 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         googleMap.setMyLocationEnabled(true);
-
+        map = googleMap;
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
                 try {
                     setCameraView();
+                    addMapMarkers();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
             }
         });
-        map = googleMap;
-
-
 
     }
 
     private void setCameraView() throws ParseException {
         mapBoundary = new LatLngBounds(
-                new LatLng(userLocation.getLatitude()-.1,userLocation.getLongitude()-.1),
-                new LatLng(userLocation.getLatitude()+.1, userLocation.getLongitude()+.1)
+                new LatLng(userLocation.getLatitude()-.01,userLocation.getLongitude()-.01),
+                new LatLng(userLocation.getLatitude()+.01, userLocation.getLongitude()+.01)
         );
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(mapBoundary, 2));
     }
 
+    private void setUserPosition() throws ParseException {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        userLocation = (ParseGeoPoint) query.get(ParseUser.getCurrentUser().getObjectId()).get("currentLocation");
+    }
+
+    private void addMapMarkers() throws ParseException {
+        if(map != null) {
+            if (coordinates != null) {
+                for (int  i = 0; i >coordinates.size(); i++) {
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+                    LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
+                    Marker contact = map.addMarker(
+                            new MarkerOptions()
+                                    .position(location)
+                                    .title((String) query.get(userNames.get(i)).get("username"))
+                                    .snippet((String) query.get(userNames.get(i)).get("phoneNumber"))
+
+                    );
+                    Log.d(TAG, "Added user " + userNames.get(i));
+                }
+            }
+        }
+    }
     // Life Cycle Functions ----------------------------------------------------------------------------------------------------------
     @Override
     public void onStart() {
