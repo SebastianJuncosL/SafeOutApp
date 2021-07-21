@@ -76,9 +76,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        getLastLocation();
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
-        getLastLocation();
+
 
 
     }
@@ -199,7 +200,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 new LatLng(userLocation.getLatitude()-.01,userLocation.getLongitude()-.01),
                 new LatLng(userLocation.getLatitude()+.01, userLocation.getLongitude()+.01)
         );
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(mapBoundary, 2));
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(mapBoundary, 2));
     }
 
     private void setUserPosition() throws ParseException {
