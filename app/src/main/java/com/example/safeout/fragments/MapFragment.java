@@ -37,6 +37,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -72,6 +73,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         fLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         getLastLocation();
+
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
@@ -132,7 +134,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     // Retrieving contacts also gets their location
@@ -168,13 +169,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
         if (mapViewBundle == null) {
             mapViewBundle = new Bundle();
             outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
         }
-
         mapView.onSaveInstanceState(mapViewBundle);
     }
 
@@ -188,25 +187,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         googleMap.setMyLocationEnabled(true);
         map = googleMap;
+        addMapMarkers();
 
-        if (coordinates != null) {
-            for (int i = 0; i < userNames.size(); i++) {
-                LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
-                map.addMarker(
-                        new MarkerOptions()
-                                .position(location)
-                                .title(userNames.get(i))
-                                .snippet(phoneNumbers.get(i))
-                );
-            }
-        }
-
-
-        try {
-            addMapMarkers();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        // OnMalLoadedCallback is necessary for animating the camera since
+        // it means that mapBoundaries can be set
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
@@ -218,7 +202,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
-
     }
 
     private void setCameraView() throws ParseException {
@@ -229,26 +212,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(mapBoundary, 2));
     }
 
-    private void setUserPosition() throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        userLocation = (ParseGeoPoint) query.get(ParseUser.getCurrentUser().getObjectId()).get("currentLocation");
-    }
-
-    private void addMapMarkers() throws ParseException {
-        if(map != null) {
-            if (coordinates != null) {
-                for (int  i = 0; i >coordinates.size(); i++) {
-                    ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-                    LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
-                    map.addMarker(
-                            new MarkerOptions()
-                                    .position(location)
-                                    .title((String) query.get(userNames.get(i)).get("username"))
-                                    .snippet((String) query.get(userNames.get(i)).get("phoneNumber"))
-
-                    );
-                    Log.d(TAG, "Added user " + userNames.get(i));
-                }
+    private void addMapMarkers(){
+        if (coordinates != null) {
+            for (int i = 0; i < userNames.size(); i++) {
+                LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
+                map.addMarker(
+                        new MarkerOptions()
+                                .position(location)
+                                .title(userNames.get(i))
+                                .snippet(phoneNumbers.get(i))
+                );
             }
         }
     }
