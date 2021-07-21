@@ -17,7 +17,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.safeout.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,6 +43,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     private GoogleMap map;
     private LatLngBounds mapBoundary;
+    private ParseGeoPoint userLocation;
+
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private FusedLocationProviderClient fLocationClient;
     // Friends/Contacts List
@@ -61,7 +66,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState);
         mapView = view.findViewById(R.id.mapView);
         fLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
@@ -69,7 +73,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
         getLastLocation();
-        // Fetch location and reposition camera
+
+        try {
+            setUserPosition();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // TODO: Fetch location and reposition camera
 
         try {
             getFriends();
@@ -80,10 +91,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // Backend and Location Functions --------------------------------------------------------------------------------------------------
 
+    private void setUserPosition() throws ParseException {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        userLocation = (ParseGeoPoint) query.get(ParseUser.getCurrentUser().getObjectId()).get("currentLocation");
+    }
+
     // getting location also uploads it to DB
     private void getLastLocation() {
-        Log.d(TAG, "Function called");
-
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -99,10 +113,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 sendLocationToDB(geoPoint);
             }
         });
-    }
-
-    private void setUserPosition() {
-        ParseGeoPoint user;
     }
 
     private void sendLocationToDB(ParseGeoPoint location) {
@@ -123,10 +133,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
+    // Retrieving contacts also gets their location
     private void getFriends() throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        if (query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList") == null)
-        {
+        if (query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList") == null) {
             Log.d(TAG, "User has no contacts");
             return;
         }
@@ -166,7 +176,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -174,7 +183,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         googleMap.setMyLocationEnabled(true);
+
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                try {
+                    setCameraView();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         map = googleMap;
+
+
+
+    }
+
+    private void setCameraView() throws ParseException {
+        mapBoundary = new LatLngBounds(
+                new LatLng(userLocation.getLatitude()-.1,userLocation.getLongitude()-.1),
+                new LatLng(userLocation.getLatitude()+.1, userLocation.getLongitude()+.1)
+        );
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(mapBoundary, 2));
     }
 
     // Life Cycle Functions ----------------------------------------------------------------------------------------------------------
