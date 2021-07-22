@@ -14,9 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.safeout.R;
+import com.example.safeout.activities.FriendsActivity;
 import com.example.safeout.activities.LoginActivity;
 import com.example.safeout.activities.MainActivity;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -26,6 +26,7 @@ import com.parse.ParseUser;
 public class UserFragment extends Fragment {
 
     private Button btnLogout;
+    private Button btnAddFriend;
 
     @Nullable
     @Override
@@ -37,12 +38,26 @@ public class UserFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         btnLogout = view.findViewById(R.id.btnLogOut);
+        btnAddFriend = view.findViewById(R.id.svSearchUser);
+
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 resetStatus();
             }
         });
+
+        btnAddFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToFriendsActivity();
+            }
+        });
+    }
+
+    private void goToFriendsActivity() {
+        Intent i = new Intent(getContext(), FriendsActivity.class);
+        startActivity(i);
     }
 
     private void logOut() {

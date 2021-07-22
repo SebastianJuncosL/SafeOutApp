@@ -238,7 +238,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 .title(userNames.get(i))
                                 .snippet(phoneNumbers.get(i)))
                 );
-
             }
         }
     }
