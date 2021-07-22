@@ -1,6 +1,10 @@
 package com.example.safeout.fragments;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -16,6 +20,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.safeout.R;
+import com.example.safeout.activities.MainActivity;
+import com.example.safeout.services.LocationService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
@@ -38,6 +44,8 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -85,9 +93,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
+        startLocationService();
     }
 
     // Backend and Location Functions --------------------------------------------------------------------------------------------------
+
+    private void startLocationService(){
+        if(!isLocationServiceRunning()){
+            Intent serviceIntent = new Intent(getContext(), LocationService.class);
+            // this.startService(serviceIntent);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+                getContext().startForegroundService(serviceIntent);
+            }
+        }
+    }
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if(".services.LocationService".equals(service.service.getClassName())) {
+                Log.d(TAG, "isLocationServiceRunning: location service is already running.");
+                return true;
+            }
+        }
+        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        return false;
+    }
 
     // getting location also uploads it to DB
     private void getLastLocation() {
