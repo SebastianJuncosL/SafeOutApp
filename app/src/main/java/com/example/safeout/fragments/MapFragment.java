@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,12 +51,14 @@ import static androidx.core.content.ContextCompat.getSystemService;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String TAG = "MapFragment";
+    public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    public static final int LOCATION_UPDATE_INTERVAL = 3000; // 3 seconds
+
     private MapView mapView;
     private GoogleMap map;
     private LatLngBounds mapBoundary;
     private ParseGeoPoint userLocation;
 
-    public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private FusedLocationProviderClient fLocationClient;
     // Friends/Contacts List
     private ArrayList<String> userIds = new ArrayList<>();
@@ -64,6 +67,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<ParseGeoPoint> coordinates = new ArrayList<>();
     // Friends Phone numbers
     private ArrayList<String> phoneNumbers = new ArrayList<>();
+    // Map markers
+    private ArrayList<Marker> markers = new ArrayList<>();
+
+    private Handler handler = new Handler();
+    private Runnable runnable;
 
     // Creating Fragments Functions ------------------------------------------------------------------------------------------------------------
     // Doing anything inside this function is useless,
@@ -97,29 +105,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // Backend and Location Functions --------------------------------------------------------------------------------------------------
-
-    private void startLocationService(){
-        if(!isLocationServiceRunning()){
-            Intent serviceIntent = new Intent(getContext(), LocationService.class);
-            // this.startService(serviceIntent);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
-                getContext().startForegroundService(serviceIntent);
-            }
-        }
-    }
-
-    private boolean isLocationServiceRunning() {
-        ActivityManager manager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-            if(".services.LocationService".equals(service.service.getClassName())) {
-                Log.d(TAG, "isLocationServiceRunning: location service is already running.");
-                return true;
-            }
-        }
-        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
-        return false;
-    }
 
     // getting location also uploads it to DB
     private void getLastLocation() {
@@ -248,22 +233,81 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (coordinates != null) {
             for (int i = 0; i < userNames.size(); i++) {
                 LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
-                map.addMarker(
-                        new MarkerOptions()
+                markers.add(map.addMarker(new MarkerOptions()
                                 .position(location)
                                 .title(userNames.get(i))
-                                .snippet(phoneNumbers.get(i))
+                                .snippet(phoneNumbers.get(i)))
                 );
+
             }
         }
     }
+
+    private void removeMarkers() {
+        for (int i = 0; i < markers.size(); i++) {
+            markers.get(i).remove();
+        }
+    }
+
+    // Location Services and Refreshing Functions ------------------------------------------------------------------------------------
+
+    private void startLocationService(){
+        if(!isLocationServiceRunning()){
+            Intent serviceIntent = new Intent(getContext(), LocationService.class);
+            // this.startService(serviceIntent);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+                getContext().startForegroundService(serviceIntent);
+            }
+        }
+    }
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if(".services.LocationService".equals(service.service.getClassName())) {
+                Log.d(TAG, "isLocationServiceRunning: location service is already running.");
+                return true;
+            }
+        }
+        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        return false;
+    }
+
+    private void startUserLocationsRunnable() {
+        handler.postDelayed(runnable = new Runnable() {
+            @Override
+            public void run() {
+                retrieveUserLocations();
+                handler.postDelayed(runnable, LOCATION_UPDATE_INTERVAL);
+            }
+        }, LOCATION_UPDATE_INTERVAL);
+    }
+
+    private void stopLocationUpdates() {
+        handler.removeCallbacks(runnable);
+    }
+
+    private void retrieveUserLocations() {
+        try {
+            getFriends();
+            removeMarkers();
+            markers.clear();
+            addMapMarkers();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     // Life Cycle Functions ----------------------------------------------------------------------------------------------------------
     @Override
     public void onStart() {
         super.onStart();
         mapView.onStart();
-
+        getLastLocation();
+        startLocationService();
     }
 
     @Override
@@ -282,12 +326,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mapView.onResume();
+        startUserLocationsRunnable();
+        getLastLocation();
+        startLocationService();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        stopLocationUpdates();
     }
 
     @Override
