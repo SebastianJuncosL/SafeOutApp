@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/ivSProfilePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tvSUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="45dp"
+        android:layout_toEndOf="@+id/ivSProfilePic"
+        android:fontFamily="@font/lato_light"
+        android:text="Username"
+        android:textColor="#000000"
+        android:textSize="34sp" />
+
+    <Button
+        android:id="@+id/btnSAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSUsername"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="15dp"
+        android:layout_toEndOf="@+id/ivSProfilePic"
+        android:fontFamily="@font/lato"
+        android:text="Send Friend Request"
+        android:textColor="@color/white"
+        app:backgroundTint="#8FDB39" />
+</RelativeLayout>

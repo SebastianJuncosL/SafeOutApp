@@ -21,8 +21,8 @@
         android:id="@+id/tvTotalRequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/rvSearchResults"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="93dp"
         android:background="#ECECEC"
         android:text="You have 0 requests"
         android:textAlignment="center" />
@@ -52,5 +52,13 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTotalContacts"
         android:layout_alignParentStart="true" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSearchResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/svSearchUser"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
 
 </RelativeLayout>

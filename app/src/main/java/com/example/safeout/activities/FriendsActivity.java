@@ -1,6 +1,7 @@
 package com.example.safeout.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -8,6 +9,12 @@ import android.widget.Button;
 import com.example.safeout.R;
 
 public class FriendsActivity extends AppCompatActivity {
+
+    public static final String TAG = "FriendsActivity";
+
+    private RecyclerView rvSearchResults;
+    private RecyclerView rvRequests;
+    private RecyclerView rvFriends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
