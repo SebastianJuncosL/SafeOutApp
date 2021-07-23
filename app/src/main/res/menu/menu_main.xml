@@ -16,5 +16,4 @@
         android:id="@+id/user"
         android:icon="@drawable/ic_action_profile"
         android:title="User" />
-
 </menu>

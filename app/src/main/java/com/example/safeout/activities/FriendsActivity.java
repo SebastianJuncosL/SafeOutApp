@@ -56,34 +56,21 @@ public class FriendsActivity extends AppCompatActivity {
         // set the layout manager on the recycler view
         rvFriends.setLayoutManager(new LinearLayoutManager(this));
         // query friends from User
-        queryFriends();
+        try {
+            queryFriends();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void queryFriends() {
-        // specify what type of data we want to query - Post.class
-        ParseQuery<FriendInformation> query = ParseQuery.getQuery(FriendInformation.class);
-        // include data referred by user key
-        query.include(FriendInformation.userId);
-        // start an asynchronous call for posts
-        query.findInBackground(new FindCallback<FriendInformation>() {
-
-            @Override
-            public void done(List<FriendInformation> friends, ParseException e) {
-                // check for errors
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting friends", e);
-                    return;
-                }
-
-                // for debugging purposes let's print every post description to logcat
-                for (FriendInformation friend : friends) {
-                    Log.i(TAG, "Friend: " + friend.getUserName() + ", phone: " + friend.getPhoneNumber());
-                }
-
-                // save received posts to list and notify adapter of new data
-                information.addAll(friends);
-                friendsAdapter.notifyDataSetChanged();
-            }
-        });
+    private void queryFriends() throws ParseException {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        Log.d(TAG, query.get(ParseUser.getCurrentUser().getObjectId()).get("friendsList").toString());
     }
+
+    private void createFriends() {
+
+    }
+
+    // TODO: Move contacts and requests to different activities
 }

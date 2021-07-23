@@ -29,7 +29,6 @@ public class FriendInformationAdapter extends RecyclerView.Adapter<FriendInforma
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_friend_information, parent, false);
-
         return new ViewHolder(view);
     }
 

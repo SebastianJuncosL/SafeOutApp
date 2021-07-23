@@ -21,6 +21,8 @@ public class FriendInformation extends ParseObject {
 
     public String getUserName() { return userName; }
 
-    // Will be used for uplading profile picture functionality
+    // Will be used for uploading profile picture functionality
     public void setProfilePic(ParseFile picture) { put("profilePicture", picture); }
+
+
 }

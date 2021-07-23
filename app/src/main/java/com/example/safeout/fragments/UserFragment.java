@@ -17,6 +17,7 @@ import com.example.safeout.R;
 import com.example.safeout.activities.FriendsActivity;
 import com.example.safeout.activities.LoginActivity;
 import com.example.safeout.activities.MainActivity;
+import com.example.safeout.activities.SearchActivity;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -56,7 +57,7 @@ public class UserFragment extends Fragment {
     }
 
     private void goToFriendsActivity() {
-        Intent i = new Intent(getContext(), FriendsActivity.class);
+        Intent i = new Intent(getContext(), SearchActivity.class);
         startActivity(i);
     }
 
