@@ -7,6 +7,12 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.example.safeout.R;
+import com.example.safeout.adapters.FriendRequestAdapter;
+import com.example.safeout.models.FriendInformation;
+import com.example.safeout.models.FriendRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FriendsActivity extends AppCompatActivity {
 
@@ -16,6 +22,9 @@ public class FriendsActivity extends AppCompatActivity {
     private RecyclerView rvRequests;
     private RecyclerView rvFriends;
 
+    public List<FriendInformation> information;
+    public List<FriendRequest> requests;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,5 +33,7 @@ public class FriendsActivity extends AppCompatActivity {
         // hide action bar (this only contains the name of the app)
         getSupportActionBar().hide();
 
+        information = new ArrayList<>();
+        requests = new ArrayList<>();
     }
 }
