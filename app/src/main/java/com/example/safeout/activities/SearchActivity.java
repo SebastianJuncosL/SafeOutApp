@@ -48,27 +48,6 @@ public class SearchActivity extends AppCompatActivity {
         rvSearchResults.setLayoutManager(layoutManager);
         results = new ArrayList<>();
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        // query.selectKeys(Arrays.asList("username", "objectId"));
-        ParseQuery<ParseObject> tests = query.whereContains("username", "ri");
-        try {
-            Log.d(TAG, String.valueOf(tests.count()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null ) {
-                    Log.d(TAG, objects.size() + " users found");
-                    for (int  i = 0; i < objects.size(); i++) {
-                        Log.d(TAG, objects.get(i).get("profilePicture").toString());
-                        results.add(new SearchResult(objects.get(i).get("username").toString()));
-                    }
-                }
-            }
-        });
         searchResultAdapter = new SearchResultAdapter(results);
         rvSearchResults.setAdapter(searchResultAdapter);
 
@@ -76,6 +55,7 @@ public class SearchActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "Search is: " + query);
                 searchForUser(query);
                 return true;
             }
@@ -85,17 +65,22 @@ public class SearchActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
-        Intent intent = getIntent();
-        if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query2 = intent.getStringExtra(SearchManager.QUERY);
-            // searchForUser(query2);
-        }
     }
 
 
     private void searchForUser(String query) {
+        ParseQuery<SearchResult> dbQuery = ParseQuery.getQuery("_User");
+        dbQuery.selectKeys(Arrays.asList("username", "profilePicture")).whereContains("username", query);
+        List<SearchResult> res = null;
+        try {
+            res = dbQuery.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < res.size(); i++) {
+            results.add(new SearchResult(res.get(i).getUserName(), res.get(i).getProfilePicture().toString()));
+        }
+        searchResultAdapter.notifyDataSetChanged();
 
     }
 
