@@ -1,6 +1,7 @@
 package com.example.safeout.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +15,17 @@ import com.bumptech.glide.Glide;
 import com.example.safeout.R;
 import com.example.safeout.models.SearchResult;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.List;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder> {
 
     Context context;
-    List<SearchResult> results;
+    List<ParseUser> results;
 
-    public SearchResultAdapter(List<SearchResult> results) {
+    public SearchResultAdapter(List<ParseUser> results, Context context) {
+        this.context = context;
         this.results = results;
     }
 
@@ -34,7 +37,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     @Override
     public void onBindViewHolder(SearchResultAdapter.ViewHolder holder, int position) {
-        SearchResult result = results.get(position);
+        ParseUser result = results.get(position);
         holder.bind(result);
     }
 
@@ -54,11 +57,13 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             ivSProfilePic = itemView.findViewById(R.id.ivSProfilePic);
         }
 
-        public void bind(SearchResult result) {
-            tvSUsername.setText(result.getUserName());
-            ParseFile image = result.getProfilePicture();
+        public void bind(ParseUser result) {
+            tvSUsername.setText(result.getUsername());
+            ParseFile image = result.getParseFile("profilePicture");
             if (image != null) {
-                Glide.with(context).load(result.getProfilePicture().getUrl()).into(ivSProfilePic);
+                Glide.with(context)
+                        .load(image.getUrl())
+                        .into(ivSProfilePic);
             }
         }
     }
