@@ -6,10 +6,12 @@ import com.parse.ParseObject;
 
 @ParseClassName("SearchResult")
 public class SearchResult extends ParseObject {
-    private String userName;
-    private String profilePicture;
+    public String userName;
+    public String profilePicture;
 
     public SearchResult() {}
+
+    public SearchResult(String userName) { this.userName = userName; }
 
     public SearchResult(String userName, String profilePicture) {
         this.userName = userName;
@@ -20,15 +22,7 @@ public class SearchResult extends ParseObject {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public ParseFile getProfilePicture() {
         return getParseFile(profilePicture);
-    }
-
-    public void setProfilePicture(ParseFile profilePicture) {
-        put("profilePicture", profilePicture);
     }
 }
