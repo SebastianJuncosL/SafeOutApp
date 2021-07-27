@@ -108,7 +108,10 @@ public class LocationService extends Service {
                             ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
                             ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
                             try {
-                                query.get(ParseUser.getCurrentUser().getObjectId()).put("currentLocation", geoPoint);
+                                if(ParseUser.getCurrentUser() != null)
+                                    query.get(ParseUser.getCurrentUser().getObjectId()).put("currentLocation", geoPoint);
+                                else
+                                    return;
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }

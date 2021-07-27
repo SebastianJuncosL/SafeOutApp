@@ -78,36 +78,8 @@ public class SearchActivity extends AppCompatActivity {
                     return;
                 }
                 Log.d(TAG, String.valueOf(objects.size()));
-                results.addAll(objects);
-                searchResultAdapter.notifyDataSetChanged();
-            }
-        });
-        // dbQuery.selectKeys(Arrays.asList("username", "profilePicture")).whereContains("username", query);
-        // List<SearchResult> res = null;
-        // try {
-        //    res = dbQuery.find();
-        // } catch (ParseException e) {
-        //     e.printStackTrace();
-        // }
-        // for (int i = 0; i < res.size(); i++) {
-        //     results.add(new SearchResult(res.get(i).getUserName(), res.get(i).getProfilePicture().toString()));
-        // }
-        // searchResultAdapter.notifyDataSetChanged();
-
-    }
-
-    public void searchingTest(String search) {
-        ParseQuery<ParseUser> query = ParseQuery.getQuery("_User");
-        query.whereContains("username", search);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, e.getMessage());
+                if (objects.isEmpty())
                     return;
-                }
-                Log.d(TAG, "Got " + String.valueOf(objects.size()) + " matches");
-
                 results.addAll(objects);
                 searchResultAdapter.notifyDataSetChanged();
             }

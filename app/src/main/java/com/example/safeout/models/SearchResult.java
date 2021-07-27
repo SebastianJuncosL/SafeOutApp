@@ -13,6 +13,7 @@ public class SearchResult extends ParseObject {
 
     public static final String USERNAME = "username";
     public static final String PROFILE_PIC = "profilePicture";
+    public static final String OBJECT_ID = "objectId";
 
     public String getUserName() {
         return getString(USERNAME);
@@ -21,4 +22,6 @@ public class SearchResult extends ParseObject {
     public ParseFile getProfilePicture() {
         return getParseFile(PROFILE_PIC);
     }
+
+    public String getObjectId() { return getString(OBJECT_ID); }
 }
