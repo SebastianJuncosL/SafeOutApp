@@ -52,7 +52,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String TAG = "MapFragment";
     public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
-    public static final int LOCATION_UPDATE_INTERVAL = 3000; // 3 seconds
+    public static final int LOCATION_UPDATE_INTERVAL = 28000; // 28 seconds
 
     private MapView mapView;
     private GoogleMap map;

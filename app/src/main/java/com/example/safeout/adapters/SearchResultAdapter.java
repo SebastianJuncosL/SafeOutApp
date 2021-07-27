@@ -97,7 +97,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             Log.d(TAG, "Object id: " + results.get(index).getObjectId() + " for user: " + results.get(index).getUsername());
 
             String userId = results.get(index).getObjectId();
-
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
             List<String> friendsOfUser = ParseUser.getCurrentUser().getList("friendsList");
 
             if (friendsOfUser != null) {
@@ -105,11 +105,11 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                     Log.d(TAG, user + " is friend of " + ParseUser.getCurrentUser().getUsername());
                 }
                 if (friendsOfUser.contains(userId)) {
-                    Toast.makeText(context, "This user is already your friend", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, query.get(userId).get("username") + " is already your friend", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+
 
             List<String> requestsOfOtherUser = query.get(userId).getList("friendRequests");
 
@@ -141,7 +141,8 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             query.getInBackground(userId, new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject object, ParseException e) {
-                    object.add("friendrequests", ParseUser.getCurrentUser().getObjectId());
+
+                    object.add("friendRequests", "\"" + ParseUser.getCurrentUser().getObjectId() + "\"");
                     object.saveInBackground();
                 }
             });

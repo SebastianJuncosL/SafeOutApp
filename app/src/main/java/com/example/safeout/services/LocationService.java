@@ -39,8 +39,8 @@ public class LocationService extends Service {
     public static final String TAG = "LocationService";
     private FusedLocationProviderClient fusedLocationProviderClient;
     // Time before an update is made
-    private final static long UPDATE_INTERVAL = 4000; // 4 seconds
-    private final static long FASTEST_INTERVAL = 2000; // 2 seconds
+    private final static long UPDATE_INTERVAL = 30000; // 30 seconds
+    private final static long FASTEST_INTERVAL = 25000; // 25 seconds
 
     @Nullable
     @Override
