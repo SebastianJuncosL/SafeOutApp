@@ -65,6 +65,8 @@ public class SearchActivity extends AppCompatActivity {
 
 
     private void searchForUser(String query) {
+
+        query = query.substring(0,1).toUpperCase() + query.substring(1);
         results.clear();
         searchResultAdapter.notifyDataSetChanged();
         ParseUser currentUser = ParseUser.getCurrentUser();

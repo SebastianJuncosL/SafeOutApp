@@ -6,6 +6,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +23,9 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.safeout.R;
 import com.example.safeout.activities.MainActivity;
 import com.example.safeout.services.LocationService;
@@ -31,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -43,6 +50,12 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -67,6 +80,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<ParseGeoPoint> coordinates = new ArrayList<>();
     // Friends Phone numbers
     private ArrayList<String> phoneNumbers = new ArrayList<>();
+    // Friends Profile Pictures
+    private ArrayList<URL> profilePics = new ArrayList<>();
     // Map markers
     private ArrayList<Marker> markers = new ArrayList<>();
 
@@ -98,6 +113,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             getFriends();
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+        if (!profilePics.isEmpty()) {
+            for (int i = 0; i < profilePics.size(); i++) {
+                Log.d(TAG, "url is: " + profilePics.get(i) + " " + userNames.get(i));
+            }
+        } else {
+            Log.d(TAG, "Images are empty");
         }
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
@@ -171,6 +193,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             coordinates.add((ParseGeoPoint) query.get(userIds.get(i)).get("currentLocation"));
             userNames.add((String) query.get(userIds.get(i)).get("username"));
             phoneNumbers.add((String) query.get(userIds.get(i)).get("phoneNumber"));
+            try {
+                profilePics.add( new URL(query.get(userIds.get(i)).getParseFile("profilePicture").getUrl()));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
         if (coordinates == null) {
             Log.d(TAG, "There are no friends, or they aren't sharing location");
@@ -204,7 +231,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         googleMap.setMyLocationEnabled(true);
         map = googleMap;
-        addMapMarkers();
+        try {
+            addMapMarkers();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         // OnMalLoadedCallback is necessary for animating the camera since
         // it means that mapBoundaries can be set
@@ -229,14 +261,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(mapBoundary, 2));
     }
 
-    private void addMapMarkers(){
+    private void addMapMarkers() throws IOException {
         if (coordinates != null) {
             for (int i = 0; i < userNames.size(); i++) {
                 LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
                 markers.add(map.addMarker(new MarkerOptions()
                                 .position(location)
                                 .title(userNames.get(i))
-                                .snippet(phoneNumbers.get(i)))
+                                .snippet("📞 " + phoneNumbers.get(i))
+                        )
                 );
             }
         }
@@ -288,14 +321,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void retrieveUserLocations() {
+
         try {
             getFriends();
-            removeMarkers();
-            markers.clear();
-            addMapMarkers();
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        removeMarkers();
+            markers.clear();
+        try {
+            addMapMarkers();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
