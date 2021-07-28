@@ -39,7 +39,7 @@
         android:layout_marginTop="15dp"
         android:layout_toEndOf="@+id/ivSProfilePic"
         android:fontFamily="@font/lato"
-        android:text="Send Friend Request"
+        android:text="Add Friend"
         android:textColor="@color/white"
         app:backgroundTint="#8FDB39" />
 </RelativeLayout>

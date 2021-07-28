@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -249,6 +250,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                String phoneNumber = marker.getSnippet();
+                phoneNumber = phoneNumber.substring(3);
+                Log.d(TAG, "Phone number is" + phoneNumber);
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:+"+phoneNumber));
+                startActivity(intent);
             }
         });
     }
