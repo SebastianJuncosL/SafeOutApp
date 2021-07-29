@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,11 +9,11 @@
         android:id="@+id/btnLogOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/ivUserProfilePicture"
         android:layout_alignParentStart="false"
-        android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="158dp"
-        android:layout_marginTop="227dp"
+        android:layout_marginTop="191dp"
         android:text="Logout" />
 
     <Button
@@ -21,6 +23,38 @@
         android:layout_below="@+id/btnLogOut"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
-        android:text="Contacts" />
+        android:text="Contacts"
+        />
+
+    <ImageView
+        android:id="@+id/ivUserProfilePicture"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:scaleType="fitCenter"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/btnChangePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvUserName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        app:icon="@android:drawable/ic_menu_camera"/>
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivUserProfilePicture"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/lato_light"
+        android:text="Username"
+        android:textColor="#000000"
+        android:textSize="34sp" />
 
 </RelativeLayout>

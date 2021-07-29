@@ -29,6 +29,8 @@ import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.safeout.R;
 import com.example.safeout.activities.MainActivity;
+import com.example.safeout.models.MarkerManagerRenderer;
+import com.example.safeout.models.MyMarkers;
 import com.example.safeout.services.LocationService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -45,15 +47,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.clustering.ClusterManager;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -82,7 +89,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Friends Phone numbers
     private ArrayList<String> phoneNumbers = new ArrayList<>();
     // Friends Profile Pictures
-    private ArrayList<URL> profilePics = new ArrayList<>();
+    private ArrayList<ParseFile> profilePics = new ArrayList<>();
     // Map markers
     private ArrayList<Marker> markers = new ArrayList<>();
 
@@ -194,11 +201,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             coordinates.add((ParseGeoPoint) query.get(userIds.get(i)).get("currentLocation"));
             userNames.add((String) query.get(userIds.get(i)).get("username"));
             phoneNumbers.add((String) query.get(userIds.get(i)).get("phoneNumber"));
-            try {
-                profilePics.add( new URL(query.get(userIds.get(i)).getParseFile("profilePicture").getUrl()));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            profilePics.add(query.get(userIds.get(i)).getParseFile("profilePicture"));
         }
         if (coordinates == null) {
             Log.d(TAG, "There are no friends, or they aren't sharing location");
@@ -288,9 +291,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void removeMarkers() {
-        for (int i = 0; i < markers.size(); i++) {
-            markers.get(i).remove();
-        }
+        markers.clear();
     }
 
     // Location Services and Refreshing Functions ------------------------------------------------------------------------------------
