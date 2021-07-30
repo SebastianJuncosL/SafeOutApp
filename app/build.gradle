@@ -46,6 +46,6 @@ dependencies {
     // Cluster dependency -> used for making user markers
     implementation "com.google.maps.android:android-maps-utils:2.2.3"
     // Glide dependency -> for images
-    implementation "com.github.bumptech.glide:glide:4.8.0"
-    annotationProcessor "com.github.bumptech.glide:compiler:4.8.0"
+    implementation "com.github.bumptech.glide:glide:4.9.0"
+    annotationProcessor "com.github.bumptech.glide:compiler:4.9.0"
 }

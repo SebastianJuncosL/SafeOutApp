@@ -10,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,6 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +30,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.safeout.R;
 import com.example.safeout.services.LocationService;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -249,7 +254,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 phoneNumber = phoneNumber.substring(3);
                 Log.d(TAG, "Phone number is" + phoneNumber);
                 Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:+"+phoneNumber));
+                intent.setData(Uri.parse("tel:+52"+phoneNumber));
                 startActivity(intent);
             }
         });
@@ -264,19 +269,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void addMapMarkers() throws IOException {
-        new DownloadImages().execute();
+        // new DownloadImages().execute();
         if (coordinates != null) {
             for (int i = 0; i < userNames.size(); i++) {
 
-                Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-                Bitmap bmp = Bitmap.createBitmap(80,80, conf);
-                Canvas canvas = new Canvas(bmp);
 
-                Paint color = new Paint();
-                color.setTextSize(35);
-                color.setColor(Color.BLACK);
-
-                canvas.drawBitmap(convertedImages.get(i), 0, 0, color);
 
                 LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
 
@@ -284,7 +281,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 .position(location)
                                 .title(userNames.get(i))
                                 .snippet("📞 " + phoneNumbers.get(i))
-                                .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(userNames.get(i), profilePics.get(i))))
+                                // .icon(BitmapDescriptorFactory.fromBitmap(bmp))
                         )
                 );
             }
@@ -395,6 +393,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onLowMemory();
         mapView.onLowMemory();
     }
+
+    private Bitmap getMarkerBitmapFromView(String name, ParseFile image) {
+
+        //HERE YOU CAN ADD YOUR CUSTOM VIEW
+        View customMarkerView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.map_marker, null);
+
+        ImageView ivImageOnMap = customMarkerView.findViewById(R.id.ivImageOnMap);
+        TextView textView = (TextView) customMarkerView.findViewById(R.id.txt_name);
+        Glide.with(getContext()).load(image.getUrl()).into(ivImageOnMap);
+        textView.setText(name);
+        customMarkerView.measure(80, 80);
+        customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
+        customMarkerView.buildDrawingCache();
+        Bitmap returnedBitmap = Bitmap.createBitmap(80, 80, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        Drawable drawable = customMarkerView.getBackground();
+        if (drawable != null)
+            drawable.draw(canvas);
+        customMarkerView.draw(canvas);
+        return returnedBitmap;
+    }
+
+
+
 
     private class DownloadImages extends AsyncTask<Void, Integer, ArrayList<Bitmap>> {
 
