@@ -2,15 +2,17 @@ package com.example.safeout.fragments;
 
 import android.Manifest;
 import android.app.ActivityManager;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -24,17 +26,9 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomViewTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.example.safeout.R;
-import com.example.safeout.activities.MainActivity;
-import com.example.safeout.models.MarkerManagerRenderer;
-import com.example.safeout.models.MyMarkers;
 import com.example.safeout.services.LocationService;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,7 +41,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.maps.android.clustering.ClusterManager;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -55,19 +48,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import static androidx.core.content.ContextCompat.getSystemService;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -89,9 +74,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     // Friends Phone numbers
     private ArrayList<String> phoneNumbers = new ArrayList<>();
     // Friends Profile Pictures
-    private ArrayList<ParseFile> profilePics = new ArrayList<>();
+    protected ArrayList<ParseFile> profilePics = new ArrayList<>();
+    protected ArrayList<Bitmap> convertedImages = new ArrayList<>();
     // Map markers
     private ArrayList<Marker> markers = new ArrayList<>();
+
 
     private Handler handler = new Handler();
     private Runnable runnable;
@@ -277,13 +264,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void addMapMarkers() throws IOException {
+        new DownloadImages().execute();
         if (coordinates != null) {
             for (int i = 0; i < userNames.size(); i++) {
+
+                Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                Bitmap bmp = Bitmap.createBitmap(80,80, conf);
+                Canvas canvas = new Canvas(bmp);
+
+                Paint color = new Paint();
+                color.setTextSize(35);
+                color.setColor(Color.BLACK);
+
+                canvas.drawBitmap(convertedImages.get(i), 0, 0, color);
+
                 LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
+
                 markers.add(map.addMarker(new MarkerOptions()
                                 .position(location)
                                 .title(userNames.get(i))
                                 .snippet("📞 " + phoneNumbers.get(i))
+                                .icon(BitmapDescriptorFactory.fromBitmap(bmp))
                         )
                 );
             }
@@ -393,5 +394,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    private class DownloadImages extends AsyncTask<Void, Integer, ArrayList<Bitmap>> {
+
+        @Override
+        protected ArrayList<Bitmap> doInBackground(Void... urls) {
+            for (int i = 0; i < profilePics.size(); i++) {
+                URL url;
+                HttpURLConnection connection;
+                InputStream inputStream = null;
+                try {
+                    url = new URL(profilePics.get(i).getUrl());
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.connect();
+                    inputStream = connection.getInputStream();
+                    connection.setDoInput(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Bitmap img = BitmapFactory.decodeStream(inputStream);
+                convertedImages.add(img);
+            }
+            return convertedImages;
+        }
     }
 }
