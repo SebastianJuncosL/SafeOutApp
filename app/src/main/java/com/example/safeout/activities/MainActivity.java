@@ -28,13 +28,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String TAG = "MainActivity";
-    // For checking permissions
-    private boolean mLocationPermissionGranted = false;
     // Constants
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9002;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9003;
+    public static final String TAG = "MainActivity";
+
+    // For checking permissions
+    public boolean mLocationPermissionGranted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Location Permissions and map functions --------------------------------------------------------------------------------------------------
 
     @Override
     protected void onResume() {

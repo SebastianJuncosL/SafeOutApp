@@ -1,8 +1,6 @@
 package com.example.safeout.fragments;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,11 +21,9 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.safeout.R;
-import com.example.safeout.activities.FriendsActivity;
 import com.example.safeout.activities.LoginActivity;
 import com.example.safeout.activities.MainActivity;
 import com.example.safeout.activities.SearchActivity;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;

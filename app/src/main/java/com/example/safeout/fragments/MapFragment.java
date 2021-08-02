@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.safeout.R;
+import com.example.safeout.activities.MainActivity;
 import com.example.safeout.services.LocationService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -281,8 +282,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 .position(location)
                                 .title(userNames.get(i))
                                 .snippet("📞 " + phoneNumbers.get(i))
-                                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(userNames.get(i), profilePics.get(i))))
-                                // .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(profilePics.get(i))))
                         )
                 );
             }
@@ -394,19 +394,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onLowMemory();
     }
 
-    private Bitmap getMarkerBitmapFromView(String name, ParseFile image) {
+    private Bitmap getMarkerBitmapFromView(ParseFile image) {
 
         //HERE YOU CAN ADD YOUR CUSTOM VIEW
         View customMarkerView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.map_marker, null);
 
         ImageView ivImageOnMap = customMarkerView.findViewById(R.id.ivImageOnMap);
-        TextView textView = (TextView) customMarkerView.findViewById(R.id.txt_name);
         Glide.with(getContext()).load(image.getUrl()).into(ivImageOnMap);
-        textView.setText(name);
-        customMarkerView.measure(80, 80);
+        customMarkerView.measure(150, 150);
         customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
         customMarkerView.buildDrawingCache();
-        Bitmap returnedBitmap = Bitmap.createBitmap(80, 80, Bitmap.Config.ARGB_8888);
+        Bitmap returnedBitmap = Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(returnedBitmap);
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
         Drawable drawable = customMarkerView.getBackground();
