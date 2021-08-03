@@ -20,6 +20,7 @@ import com.example.safeout.models.SearchResult;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
+import com.parse.ParseACL;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -87,6 +88,11 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         }
 
         private void addFriend() throws ParseException {
+
+            ParseACL acl = new ParseACL();
+            acl.setPublicWriteAccess(true);
+            acl.setWriteAccess(ParseUser.getCurrentUser(),true);
+
             Log.d(TAG, String.valueOf(results.size()));
             List<String> searchNames = new ArrayList<>();
             for (int i = 0; i < results.size(); i++) {
@@ -136,7 +142,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                     }
                 }
             }
-
+            query.get(userId).add("friendRequests", ParseUser.getCurrentUser().getObjectId());
             query.getInBackground(ParseUser.getCurrentUser().getObjectId(), (object, e) -> {
                 if (e == null) {
                     object.add("friendsList", userId);
@@ -148,19 +154,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             });
 
             Toast.makeText(context, "Friend request has been sent to " + query.get(userId).get("username"), Toast.LENGTH_SHORT).show();
-            HashMap<String, String> params = new HashMap<>();
-            params.put("otherUserId", userId);
-            params.put("userToAdd", ParseUser.getCurrentUser().getObjectId());
-            ParseCloud.callFunctionInBackground("sendFriendRequest", params, new FunctionCallback<Boolean>() {
-                @Override
-                public void done(Boolean object, ParseException e) {
-                    if (e == null && object){
-                        Log.d(TAG, "I think user was added");
-                    } else {
-                        Log.d(TAG, e.toString());
-                    }
-                }
-            });
+
         }
 
         public void bind(ParseUser result) {

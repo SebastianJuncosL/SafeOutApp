@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -21,7 +22,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +50,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.parse.FindCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -59,6 +64,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -81,7 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<String> phoneNumbers = new ArrayList<>();
     // Friends Profile Pictures
     protected ArrayList<ParseFile> profilePics = new ArrayList<>();
-    protected ArrayList<Bitmap> convertedImages = new ArrayList<>();
+    protected ArrayList<String> status = new ArrayList<>();
     // Map markers
     private ArrayList<Marker> markers = new ArrayList<>();
 
@@ -121,6 +127,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         } else {
             Log.d(TAG, "Images are empty");
+
         }
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
@@ -189,13 +196,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void getFriendsInformation() throws ParseException {
-        for (int i = 0; i < userIds.size(); i++) {
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-            coordinates.add((ParseGeoPoint) query.get(userIds.get(i)).get("currentLocation"));
-            userNames.add((String) query.get(userIds.get(i)).get("username"));
-            phoneNumbers.add((String) query.get(userIds.get(i)).get("phoneNumber"));
-            profilePics.add(query.get(userIds.get(i)).getParseFile("profilePicture"));
-        }
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        query.whereContainedIn("objectId", userIds);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                Log.d(TAG, "FriendsList"+String.valueOf(objects.size()));
+                for (int i = 0; i<objects.size(); i++) {
+                    coordinates.add((ParseGeoPoint) objects.get(i).get("currentLocation"));
+                    userNames.add((String) objects.get(i).get("username"));
+                    phoneNumbers.add((String) objects.get(i).get("phoneNumber"));
+                    profilePics.add(objects.get(i).getParseFile("profilePicture"));
+                    status.add((String) objects.get(i).get("currentStatus"));
+                    Log.d(TAG, "Status for users" + status.get(i));
+                }
+
+            }
+        });
+
         if (coordinates == null) {
             Log.d(TAG, "There are no friends, or they aren't sharing location");
         } else {
@@ -228,12 +246,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         googleMap.setMyLocationEnabled(true);
         map = googleMap;
-        try {
-            addMapMarkers();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
         // OnMalLoadedCallback is necessary for animating the camera since
         // it means that mapBoundaries can be set
@@ -242,8 +254,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onMapLoaded() {
                 try {
                     setCameraView();
-
-                } catch (ParseException e) {
+                    addMapMarkers();
+                } catch (ParseException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -270,19 +282,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void addMapMarkers() throws IOException {
-        // new DownloadImages().execute();
         if (coordinates != null) {
             for (int i = 0; i < userNames.size(); i++) {
-
-
-
                 LatLng location = new LatLng(coordinates.get(i).getLatitude(), coordinates.get(i).getLongitude());
 
                 markers.add(map.addMarker(new MarkerOptions()
                                 .position(location)
                                 .title(userNames.get(i))
                                 .snippet("📞 " + phoneNumbers.get(i))
-                                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(profilePics.get(i))))
+                                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(profilePics.get(i), status.get(i))))
                         )
                 );
             }
@@ -394,50 +402,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onLowMemory();
     }
 
-    private Bitmap getMarkerBitmapFromView(ParseFile image) {
-
-        //HERE YOU CAN ADD YOUR CUSTOM VIEW
-        View customMarkerView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.map_marker, null);
-
-        ImageView ivImageOnMap = customMarkerView.findViewById(R.id.ivImageOnMap);
-        Glide.with(getContext()).load(image.getUrl()).into(ivImageOnMap);
-        customMarkerView.measure(150, 150);
-        customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
-        customMarkerView.buildDrawingCache();
-        Bitmap returnedBitmap = Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(returnedBitmap);
-        canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
-        Drawable drawable = customMarkerView.getBackground();
-        if (drawable != null)
-            drawable.draw(canvas);
-        customMarkerView.draw(canvas);
-        return returnedBitmap;
-    }
-
-
-
-
-    private class DownloadImages extends AsyncTask<Void, Integer, ArrayList<Bitmap>> {
-
-        @Override
-        protected ArrayList<Bitmap> doInBackground(Void... urls) {
-            for (int i = 0; i < profilePics.size(); i++) {
-                URL url;
-                HttpURLConnection connection;
-                InputStream inputStream = null;
-                try {
-                    url = new URL(profilePics.get(i).getUrl());
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.connect();
-                    inputStream = connection.getInputStream();
-                    connection.setDoInput(true);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Bitmap img = BitmapFactory.decodeStream(inputStream);
-                convertedImages.add(img);
+    private Bitmap getMarkerBitmapFromView(ParseFile image, String userStatus) {
+        if (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) != null) {
+            //HERE YOU CAN ADD YOUR CUSTOM VIEW
+            View customMarkerView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.map_marker, null);
+            ImageView ivImageOnMap = customMarkerView.findViewById(R.id.ivImageOnMap);
+            FrameLayout layout = customMarkerView.findViewById(R.id.flMapMarker);
+            Glide.with(getContext()).load(image.getUrl()).into(ivImageOnMap);
+            if (userStatus == "Safe") {
+                layout.setBackgroundColor(getResources().getColor(R.color.safeGreen));
+            } else if (userStatus == "Alert"){
+                layout.setBackgroundColor(getResources().getColor(R.color.alertOrange));
+            } else if (userStatus == "Danger"){
+                layout.setBackgroundColor(getResources().getColor(R.color.dangerRed));
+            } else {
+                layout.setBackgroundColor(getResources().getColor(R.color.white));
             }
-            return convertedImages;
+            customMarkerView.measure(150, 150);
+            customMarkerView.layout(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(), customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
+            customMarkerView.buildDrawingCache();
+            Bitmap returnedBitmap = Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(returnedBitmap);
+            canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
+            Drawable drawable = customMarkerView.getBackground();
+            if (drawable != null)
+                drawable.draw(canvas);
+            customMarkerView.draw(canvas);
+            return returnedBitmap;
+        }
+        else {
+            return null;
         }
     }
 }

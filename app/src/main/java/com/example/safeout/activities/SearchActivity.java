@@ -86,5 +86,21 @@ public class SearchActivity extends AppCompatActivity {
                 searchResultAdapter.notifyDataSetChanged();
             }
         });
+        query = query.substring(0,1).toLowerCase() + query.substring(1);
+        dbQuery.whereContains("username", query);
+        dbQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, e.getMessage());
+                    return;
+                }
+                Log.d(TAG, String.valueOf(objects.size()));
+                if (objects.isEmpty())
+                    return;
+                results.addAll(objects);
+                searchResultAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }
