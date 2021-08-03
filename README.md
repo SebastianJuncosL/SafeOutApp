@@ -34,7 +34,6 @@ Even though the marketing target are people between 17 and 25, I think people of
 * See Other people's location 
 * Set safety status
 * Add people to your contacts list
-* Log in and create accounts using Facebook
 
 **Optional Nice-to-have Stories**
 
