@@ -7,43 +7,48 @@
 
     <Button
         android:id="@+id/btnLogOut"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ivUserProfilePicture"
         android:layout_alignParentStart="false"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="158dp"
-        android:layout_marginTop="191dp"
+        android:layout_marginTop="362dp"
+        android:backgroundTint="@color/dangerRed"
         android:text="Logout" />
 
     <Button
         android:id="@+id/svSearchUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnLogOut"
+        android:layout_below="@+id/tvUserName"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp"
-        android:text="Contacts"
-        />
+        android:layout_marginTop="80dp"
+        android:text="Contacts" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ivUserProfilePicture"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
-        android:scaleType="fitCenter"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:layout_marginTop="80dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnChangePic"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvUserName"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        app:icon="@android:drawable/ic_menu_camera"/>
+        android:layout_alignEnd="@+id/ivUserProfilePicture"
+        android:layout_alignBottom="@+id/ivUserProfilePicture"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/round_button"
+        app:backgroundTint="@color/safeGreen"
+        app:icon="@android:drawable/ic_menu_camera"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconTint="#FFFFFF" />
 
     <TextView
         android:id="@+id/tvUserName"

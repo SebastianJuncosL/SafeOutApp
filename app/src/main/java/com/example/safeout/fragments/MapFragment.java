@@ -95,6 +95,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Handler handler = new Handler();
     private Runnable runnable;
 
+    private Context context = getContext();
+
     // Creating Fragments Functions ------------------------------------------------------------------------------------------------------------
     // Doing anything inside this function is useless,
     // since there is nothing loaded in the app yet.
@@ -208,9 +210,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     phoneNumbers.add((String) objects.get(i).get("phoneNumber"));
                     profilePics.add(objects.get(i).getParseFile("profilePicture"));
                     status.add((String) objects.get(i).get("currentStatus"));
-                    Log.d(TAG, "Status for users" + status.get(i));
+                    Log.d(TAG, "Status for users " + status.get(i));
                 }
-
             }
         });
 
@@ -403,24 +404,44 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private Bitmap getMarkerBitmapFromView(ParseFile image, String userStatus) {
-        if (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) != null) {
+        Log.d(TAG, "user status where it matters is " + userStatus);
+        if (getActivity() != null) {
             //HERE YOU CAN ADD YOUR CUSTOM VIEW
             View customMarkerView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.map_marker, null);
             ImageView ivImageOnMap = customMarkerView.findViewById(R.id.ivImageOnMap);
-            FrameLayout layout = customMarkerView.findViewById(R.id.flMapMarker);
+            TextView tvTopPin = customMarkerView.findViewById(R.id.tvTopPin);
+            TextView tvLeftPin = customMarkerView.findViewById(R.id.tvLeftPin);
+            TextView tvRightPin = customMarkerView.findViewById(R.id.tvRightPin);
+            TextView tvBottomPin = customMarkerView.findViewById(R.id.tvBottomPin);
+            // LinearLayout layout = customMarkerView.findViewById(R.id.flMapMarker);
             Glide.with(getContext()).load(image.getUrl()).into(ivImageOnMap);
-            if (userStatus == "Safe") {
-                layout.setBackgroundColor(getResources().getColor(R.color.safeGreen));
-            } else if (userStatus == "Alert"){
-                layout.setBackgroundColor(getResources().getColor(R.color.alertOrange));
-            } else if (userStatus == "Danger"){
-                layout.setBackgroundColor(getResources().getColor(R.color.dangerRed));
+            if (userStatus.equals("Safe")) {
+                tvTopPin.setBackgroundColor(getResources().getColor(R.color.safeGreen));
+                tvLeftPin.setBackgroundColor(getResources().getColor(R.color.safeGreen));
+                tvRightPin.setBackgroundColor(getResources().getColor(R.color.safeGreen));
+                tvBottomPin.setBackgroundColor(getResources().getColor(R.color.safeGreen));
+            } else if (userStatus.equals("Alert")){
+                tvTopPin.setBackgroundColor(getResources().getColor(R.color.alertOrange));
+                tvLeftPin.setBackgroundColor(getResources().getColor(R.color.alertOrange));
+                tvRightPin.setBackgroundColor(getResources().getColor(R.color.alertOrange));
+                tvBottomPin.setBackgroundColor(getResources().getColor(R.color.alertOrange));
+            } else if (userStatus.equals("Danger")){
+                tvTopPin.setBackgroundColor(getResources().getColor(R.color.dangerRed));
+                tvLeftPin.setBackgroundColor(getResources().getColor(R.color.dangerRed));
+                tvRightPin.setBackgroundColor(getResources().getColor(R.color.dangerRed));
+                tvBottomPin.setBackgroundColor(getResources().getColor(R.color.dangerRed));
             } else {
-                layout.setBackgroundColor(getResources().getColor(R.color.white));
+                tvTopPin.setBackgroundColor(getResources().getColor(R.color.white));
+                tvLeftPin.setBackgroundColor(getResources().getColor(R.color.white));
+                tvRightPin.setBackgroundColor(getResources().getColor(R.color.white));
+                tvBottomPin.setBackgroundColor(getResources().getColor(R.color.white));
             }
             customMarkerView.measure(150, 150);
             customMarkerView.layout(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(), customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
             customMarkerView.buildDrawingCache();
+
+            customMarkerView.setBackgroundColor(getResources().getColor(R.color.alertOrange));
+
             Bitmap returnedBitmap = Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(returnedBitmap);
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);

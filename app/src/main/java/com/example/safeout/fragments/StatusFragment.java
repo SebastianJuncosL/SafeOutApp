@@ -1,11 +1,15 @@
 package com.example.safeout.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.safeout.R;
+import com.example.safeout.activities.MainActivity;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -23,6 +28,7 @@ public class StatusFragment extends Fragment {
     private Button btnSafe;
     private Button btnAlert;
     private Button btnDanger;
+    private RelativeLayout rlStatusFragmentBackground;
 
     @Nullable
     @Override
@@ -36,6 +42,7 @@ public class StatusFragment extends Fragment {
         btnSafe = view.findViewById(R.id.btnSafe);
         btnAlert = view.findViewById(R.id.btnAlert);
         btnDanger = view.findViewById(R.id.btnDanger);
+        rlStatusFragmentBackground = view.findViewById(R.id.rlStatusFragmentBackground);
 
         btnSafe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +66,8 @@ public class StatusFragment extends Fragment {
     }
 
     public void setSafe() {
+        doAnimation(getResources().getColor(R.color.safeGreen));
+
         // Database Class goes in getQuery
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
         // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
@@ -77,6 +86,8 @@ public class StatusFragment extends Fragment {
     }
 
     public void setAlert() {
+        doAnimation(getResources().getColor(R.color.alertOrange));
+
         // Database Class goes in getQuery
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
         // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
@@ -93,6 +104,7 @@ public class StatusFragment extends Fragment {
     }
 
     private void setDanger() {
+        doAnimation(getResources().getColor(R.color.dangerRed));
         // Database Class goes in getQuery
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
         // objectId -> can be retrieved from ParseUser.getCurrentUser().getObjectId()
@@ -110,5 +122,38 @@ public class StatusFragment extends Fragment {
         });
     }
 
+    private void doAnimation(int color) {
+        Animation fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
+        Animation fadeOut = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
+        rlStatusFragmentBackground.startAnimation(fadeIn);
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                rlStatusFragmentBackground.setBackgroundColor(color);
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                rlStatusFragmentBackground.startAnimation(fadeOut);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                rlStatusFragmentBackground.setBackgroundColor(getResources().getColor(R.color.white));
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+    }
     // TODO: check if there's an active location before letting the user change it's status
 }
